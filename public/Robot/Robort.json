@@ -1,5 +1,4 @@
 {"frames": [
-
 {
 	"filename": "character_robot_attack0.png",
 	"frame": {"x":0,"y":0,"w":96,"h":128},
@@ -368,5 +367,4 @@
 	"size": {"w":480,"h":1152},
 	"scale": "1",
 	"smartupdate": "$TexturePacker:SmartUpdate:471f08006ae6a0916d4e843a737b8318:f9da1727a89dc87b570d2ededa83f738:197591f9d34a907e4a07b28751682c72$"
-}
-}
+}}
