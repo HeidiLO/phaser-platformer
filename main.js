@@ -2,10 +2,10 @@ import './style.css'
 import Phaser from 'phaser'
 class MainScene extends Phaser.Scene{
   constructor(){
-    super("main-scene")
+    super ("main-scene")
   }
   preload(){
-    this.load.atlas("Robot", "Robot/Robot.png", "Robot/Robot.json");
+    this.load.atlas("Robot", "Robot.png", "Robot.json");
   }
   create(){
     const {height, width} = this.scale;
