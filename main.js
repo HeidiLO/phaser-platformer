@@ -5,7 +5,7 @@ class MainScene extends Phaser.Scene{
     super("main-scene")
   }
   preload(){
-    this.load.atlas("Robot", "Robot.png", "Robot.json");
+    this.load.atlas("Robot", "Robot/Robot.png", "Robot/Robot.json");
   }
   create(){
     const {height, width} = this.scale;
