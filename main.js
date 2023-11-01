@@ -1,23 +1,27 @@
-import './style.css'
-import Phaser from 'phaser'
-class MainScene extends Phaser.Scene{
-  constructor(){
-    super ("main-scene")
+import "./style.css";
+import Phaser from "phaser";
+class MainScene extends Phaser.Scene {
+  constructor() {
+    super("main-scene");
   }
-  preload(){
+  preload() {
     this.load.atlas("Robot", "Robot.png", "Robot.json");
   }
-  create(){
-    const {height, width} = this.scale;
-    let player = this.add.sprite(width/2, height/2, "Robot")
+  create() {
+    const { height, width } = this.scale;
+    let player = this.add.sprite(width / 2, height / 2, "Robot");
+    player.anims.create({
+      key: "run",
+      frames: player.anims.generateFrameNames()
+    })
   }
-  update(){}
+  update() {}
 }
 /**@type {Phaser.Types.Core.GameConfig}*/
 const config = {
   type: Phaser.WEBGL,
   width: 400,
   height: 400,
-  scene: [MainScene]
+  scene: [MainScene],
 };
-const game = new Phaser.Game(config)
+const game = new Phaser.Game(config);
