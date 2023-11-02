@@ -1,5 +1,11 @@
 import "./style.css";
 import Phaser from "phaser";
+const PLAYER_ANIMAS = {
+  idle: "idle",
+  walk: "walk",
+  run: "run",
+  attack: "attack",
+};
 class MainScene extends Phaser.Scene {
   constructor() {
     super("main-scene");
@@ -9,7 +15,8 @@ class MainScene extends Phaser.Scene {
   }
   create() {
     const { height, width } = this.scale;
-    let player = this.add.sprite(width / 2, height / 2, "Robot");
+    let player = this.physics.add.sprite(width / 2, height / 2, "Robot");
+    player.setCollideWorldBounds(true);
     player.anims.create({
       key: "run",
       frames: player.anims.generateFrameNames("Robot", {
@@ -21,11 +28,12 @@ class MainScene extends Phaser.Scene {
       frameRate: 12,
       repeat: -1,
     });
-   // player.play("run")
+    player.play("run")
   }
   create() {
     const { height, width } = this.scale;
-    let player = this.add.sprite(width / 2, height / 2, "Robot");
+    let player = this.physics.add.sprite(width / 2, height / 2, "Robot");
+    player.setCollideWorldBounds(true);
     player.anims.create({
       key: "walk",
       frames: player.anims.generateFrameNames("Robot", {
@@ -41,7 +49,9 @@ class MainScene extends Phaser.Scene {
   }
   create() {
     const { height, width } = this.scale;
-    let player = this.add.sprite(width / 2, height / 2, "Robot");
+    let player = this.physics.add.sprite(width / 2, height / 2, "Robot");
+    player.setCollideWorldBounds(true);
+    player.setBounce(20)
     player.anims.create({
       key: "attack",
       frames: player.anims.generateFrameNames("Robot", {
@@ -50,7 +60,7 @@ class MainScene extends Phaser.Scene {
         prefix: "character_robot_attack",
         suffix: ".png"
       }),
-      frameRate: 1200,
+      frameRate: 12,
       repeat: -1,
     });
     player.play("attack")
@@ -63,5 +73,11 @@ const config = {
   width: 400,
   height: 400,
   scene: [MainScene],
+  physics:{
+    default: "arcade",
+    arcade: {
+      gravity:{y: 200},
+    }
+  }
 };
 const game = new Phaser.Game(config);
