@@ -1,3 +1,4 @@
+import { esbuildVersion } from "vite";
 import "./style.css";
 import Phaser from "phaser";
 const TILE_SIZE = 18;
@@ -10,6 +11,7 @@ const PLAYER_ANIMAS = {
 class MainScene extends Phaser.Scene {
   constructor() {
     super("main-scene");
+    this.player;
     this.map;
     this.cursors;
   }
@@ -31,16 +33,17 @@ class MainScene extends Phaser.Scene {
     this.map.createLayer("Tile Layer 9", [marbleTiles, rockTiles], 0, 0);
     this.map.createLayer("Tile Layer 10", [marbleTiles, rockTiles], 0, 0);
     const platformLayer = this.map.createLayer(
-			"Platforms",
-			[marbleTiles, rockTiles, sandTiles, stoneTiles],
-			0,
-			0
-		);
-    let player = this.physics.add.sprite(width / 2, height / 2, "Robot");
-    player.setCollideWorldBounds(true);
-    player.anims.create({
+      "Platforms",
+      [marbleTiles, rockTiles, sandTiles, stoneTiles],
+      0,
+      0
+    );
+    this.player = this.physics.add.sprite(width / 2, height / 2, "Robot");
+    this.player.setCollideWorldBounds(true);
+    //this.player.setBounce(0.95)
+    this.player.anims.create({
       key: "run",
-      frames: player.anims.generateFrameNames("Robot", {
+      frames: this.player.anims.generateFrameNames("Robot", {
         start: 0,
         end: 2,
         prefix: "character_robot_run",
@@ -49,7 +52,7 @@ class MainScene extends Phaser.Scene {
       frameRate: 12,
       repeat: -1,
     });
-    player.play("run");
+    this.player.play("run");
     this.cursors = this.input.keyboard.addKeys({
       left: Phaser.Input.Keyboard.KeyCodes.A,
       leftArrow: Phaser.Input.Keyboard.KeyCodes.LEFT,
@@ -60,9 +63,29 @@ class MainScene extends Phaser.Scene {
       upArrow: Phaser.Input.Keyboard.KeyCodes.UP,
       run: Phaser.Input.Keyboard.KeyCodes.SHIFT,
       down: Phaser.Input.Keyboard.KeyCodes.S,
-    })
-  };
-  update() {}
+    });
+  }
+  update() {
+    if (this.cursors.left.isDown || this.cursors.leftArrow.isDown) {
+      this.player.setVelocityX(-150);
+    } else if (this.cursors.right.isDown || this.cursors.rightArrow.isDown) {
+      this.player.setVelocityX(150);
+    } else {
+      this.player.setVelocityX(0);
+    }
+     if (
+      (this.cursors.jump.isDown ||
+        this.cursors.up.isDown ||
+        this.cursors.upArrow.isDown) &&
+      this.player.body.onFloor()
+    ) {
+      this.player.setVelocityY(-150);
+    } else if (this.cursors.down.isDown) {
+      this.player.setVelocityY(150);
+    } else{ 
+      this.player.setVelocityY(0);
+    }
+  }
 }
 /**@type {Phaser.Types.Core.GameConfig}*/
 const config = {
