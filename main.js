@@ -1,4 +1,3 @@
-import { esbuildVersion } from "vite";
 import "./style.css";
 import Phaser from "phaser";
 const TILE_SIZE = 18;
@@ -73,7 +72,8 @@ class MainScene extends Phaser.Scene {
     } else {
       this.player.setVelocityX(0);
     }
-     if (
+
+    if (
       (this.cursors.jump.isDown ||
         this.cursors.up.isDown ||
         this.cursors.upArrow.isDown) &&
@@ -82,8 +82,6 @@ class MainScene extends Phaser.Scene {
       this.player.setVelocityY(-150);
     } else if (this.cursors.down.isDown) {
       this.player.setVelocityY(150);
-    } else{ 
-      this.player.setVelocityY(0);
     }
   }
 }
