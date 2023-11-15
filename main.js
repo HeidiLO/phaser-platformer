@@ -39,7 +39,7 @@ class MainScene extends Phaser.Scene {
     );
     this.player = this.physics.add.sprite(width / 2, height / 2, "Robot");
     this.player.setCollideWorldBounds(true);
-    //this.player.setBounce(0.95)
+    this.player.setBounce(0.5)
     this.player.anims.create({
       key: "run",
       frames: this.player.anims.generateFrameNames("Robot", {
@@ -72,7 +72,6 @@ class MainScene extends Phaser.Scene {
     } else {
       this.player.setVelocityX(0);
     }
-
     if (
       (this.cursors.jump.isDown ||
         this.cursors.up.isDown ||
@@ -83,6 +82,9 @@ class MainScene extends Phaser.Scene {
     } else if (this.cursors.down.isDown) {
       this.player.setVelocityY(150);
     }
+    let x = this.player.body.velocity.X;
+    let y = this.player.body.velocity.Y;
+    this.player.flipX = x <0;
   }
 }
 /**@type {Phaser.Types.Core.GameConfig}*/
