@@ -13,6 +13,7 @@ class MainScene extends Phaser.Scene {
     this.player;
     this.map;
     this.cursors;
+    this.coins;
   }
   preload() {
     this.load.atlas("Robot", "Robot.png", "Robot.json");
@@ -21,6 +22,7 @@ class MainScene extends Phaser.Scene {
     this.load.image("Sand", "tilesets/sand.png");
     this.load.image("Stone", "tilesets/stone.png");
     this.load.tilemapTiledJSON("map", "tilesets/map.json");
+    this.load.image("coin", "coin.png");
   }
   create() {
     const { height, width } = this.scale;
@@ -37,9 +39,34 @@ class MainScene extends Phaser.Scene {
       0,
       0
     );
-    this.player = this.physics.add.sprite(width / 2, height / 2, "Robot");
+    platformLayer.setCollisionByProperty({collides:true});
+    this.coins = this.physics.add.group({
+      key: "coin",
+      quantity: 12,
+      setXY: {x: 18 * 4, y: 0, stepX: 18*3},
+      setScale: {x: 0.25, y: 0.25},
+    });
+    this.coins.children.iterate((coin)=>{
+      coin
+        .setCircle(40)
+        .setCollideWorldBounds(true)
+        .setBounce(Phaser.Math.FloatBetween(0.4, 0.8))
+        .setVelocityX(Phaser.Math.FloatBetween(-10,10));
+    })
+    this.physics.add.collider(this.coins, platformLayer);
+    this.physics.add.collider(this.coins, this.coins);
+    this.player = this.physics.add.sprite(width / 2, height / 2, "Robot",);
+    this.physics.add.overlap(
+      this.player,
+      this.coins,
+      this.collectCoin,
+      undefined,
+      this
+    )
     this.player.setCollideWorldBounds(true);
+    this.physics.add.collider(this.player, platformLayer);
     this.player.setBounce(0.5)
+    this.player.setScale(0.4)
     this.player.anims.create({
       key: "run",
       frames: this.player.anims.generateFrameNames("Robot", {
@@ -78,13 +105,16 @@ class MainScene extends Phaser.Scene {
         this.cursors.upArrow.isDown) &&
       this.player.body.onFloor()
     ) {
-      this.player.setVelocityY(-150);
+      this.player.setVelocityY(-175);
     } else if (this.cursors.down.isDown) {
       this.player.setVelocityY(150);
     }
     let x = this.player.body.velocity.X;
     let y = this.player.body.velocity.Y;
     this.player.flipX = x <0;
+  }
+ collectCoin(player, coin){
+   coin.disableBody(true, true);
   }
 }
 /**@type {Phaser.Types.Core.GameConfig}*/
