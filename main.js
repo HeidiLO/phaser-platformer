@@ -14,6 +14,9 @@ class MainScene extends Phaser.Scene {
     this.map;
     this.cursors;
     this.coins;
+    this.jumpNoise;
+    this.coinNoise;
+    this.noise;
   }
   preload() {
     this.load.atlas("Robot", "Robot.png", "Robot.json");
@@ -23,8 +26,22 @@ class MainScene extends Phaser.Scene {
     this.load.image("Stone", "tilesets/stone.png");
     this.load.tilemapTiledJSON("map", "tilesets/map.json");
     this.load.image("coin", "coin.png");
+    this.load.audio("coin-noise", "coin.mp3");
+    this.load.audio("jump-noise", "jump.wav");
+    this.load.audio("noise", "background-music.mp3");
   }
   create() {
+    this.coinNoise = this.sound.add("coin-noise", {
+      volume: 0.5
+    });
+    this.jumpNoise = this.sound.add("jump-noise",{
+      volume: 0.5
+    });
+    this.noise = this.sound.add("noise",{
+      loop: true,
+      volume: 0.75
+    });
+    this.noise.play();
     const { height, width } = this.scale;
     this.map = this.make.tilemap({ key: "map" });
     const marbleTiles = this.map.addTilesetImage("marble", "Marble");
@@ -105,6 +122,7 @@ class MainScene extends Phaser.Scene {
         this.cursors.upArrow.isDown) &&
       this.player.body.onFloor()
     ) {
+      this.jumpNoise.play();
       this.player.setVelocityY(-175);
     } else if (this.cursors.down.isDown) {
       this.player.setVelocityY(150);
@@ -120,6 +138,7 @@ class MainScene extends Phaser.Scene {
     this.player.flipX = x <0;
   }
  collectCoin(player, coin){
+    this.coinNoise.play();
    coin.disableBody(true, true);
   }
 }
