@@ -44,7 +44,7 @@ class MainScene extends Phaser.Scene {
       key: "coin",
       quantity: 12,
       setXY: {x: 18 * 4, y: 0, stepX: 18*3},
-      setScale: {x: 0.25, y: 0.25},
+      setScale: {x: 0.20, y: 0.20},
     });
     this.coins.children.iterate((coin)=>{
       coin
@@ -108,6 +108,12 @@ class MainScene extends Phaser.Scene {
       this.player.setVelocityY(-175);
     } else if (this.cursors.down.isDown) {
       this.player.setVelocityY(150);
+    }
+    if (this.cursors.run.isDown && this.cursors.leftArrow.isDown){
+      this.player.setVelocityX(-300)
+    }
+    if (this.cursors.run.isDown && this.cursors.rightArrow.isDown){
+      this.player.setVelocityX(300)
     }
     let x = this.player.body.velocity.X;
     let y = this.player.body.velocity.Y;
