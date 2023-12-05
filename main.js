@@ -1,6 +1,8 @@
 import "./style.css";
 import Phaser from "phaser";
 const TILE_SIZE = 18;
+const WIDTH = 40 * TILE_SIZE;
+const HEIGHT = 20 * TILE_SIZE;
 const PLAYER_ANIMAS = {
   idle: "idle",
   walk: "walk",
@@ -31,6 +33,7 @@ class MainScene extends Phaser.Scene {
     this.load.audio("noise", "background-music.mp3");
   }
   create() {
+    this.physics.world.setBounds(0,0,WIDTH, HEIGHT);
     this.coinNoise = this.sound.add("coin-noise", {
       volume: 0.5
     });
@@ -72,7 +75,7 @@ class MainScene extends Phaser.Scene {
     })
     this.physics.add.collider(this.coins, platformLayer);
     this.physics.add.collider(this.coins, this.coins);
-    this.player = this.physics.add.sprite(width / 2, height / 2, "Robot",);
+    this.player = this.physics.add.sprite(WIDTH / 2, HEIGHT/ 2, "Robot",);
     this.physics.add.overlap(
       this.player,
       this.coins,
@@ -106,7 +109,11 @@ class MainScene extends Phaser.Scene {
       upArrow: Phaser.Input.Keyboard.KeyCodes.UP,
       run: Phaser.Input.Keyboard.KeyCodes.SHIFT,
       down: Phaser.Input.Keyboard.KeyCodes.S,
+      downArrow: Phaser.Input.Keyboard.KeyCodes.DOWN,
     });
+    this.cameras.main.setBounds(0,0, WIDTH,HEIGHT);
+    this.cameras.main.startFollow(this.player);
+    this.cameras.main.zoom = 7;
   }
   update() {
     if (this.cursors.left.isDown || this.cursors.leftArrow.isDown) {
@@ -124,14 +131,17 @@ class MainScene extends Phaser.Scene {
     ) {
       this.jumpNoise.play();
       this.player.setVelocityY(-175);
-    } else if (this.cursors.down.isDown) {
+    } else if (this.cursors.down.isDown || this.cursors.downArrow.isDown) {
       this.player.setVelocityY(150);
     }
-    if (this.cursors.run.isDown && this.cursors.leftArrow.isDown){
+    if (this.cursors.run.isDown && this.cursors.leftArrow.isDown || this.cursors.run.isDown && this.cursors.left.isDown){
       this.player.setVelocityX(-300)
     }
-    if (this.cursors.run.isDown && this.cursors.rightArrow.isDown){
+    if (this.cursors.run.isDown && this.cursors.rightArrow.isDown ||this.cursors.run.isDown && this.cursors.right.isDown ){
       this.player.setVelocityX(300)
+    }
+    if (this.cursors.run.isDown && this.cursors.upArrow.isDown && this.player.body.onFloor()||this.cursors.run.isDown && this.cursors.up.isDown && this.player.body.onFloor()){
+      this.player.setVelocityY(-300)
     }
     let x = this.player.body.velocity.X;
     let y = this.player.body.velocity.Y;
@@ -145,8 +155,8 @@ class MainScene extends Phaser.Scene {
 /**@type {Phaser.Types.Core.GameConfig}*/
 const config = {
   type: Phaser.WEBGL,
-  width: 40 * TILE_SIZE,
-  height: 20 * TILE_SIZE,
+  width: window.innerWidth,
+  height: window.innerHeight,
   scene: [MainScene],
   physics: {
     default: "arcade",
