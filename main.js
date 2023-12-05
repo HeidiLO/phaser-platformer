@@ -33,6 +33,10 @@ class MainScene extends Phaser.Scene {
     this.load.audio("noise", "background-music.mp3");
   }
   create() {
+    let playerSpawn = {
+      x: WIDTH /2,
+      y: HEIGHT/2,
+    };
     this.physics.world.setBounds(0,0,WIDTH, HEIGHT);
     this.coinNoise = this.sound.add("coin-noise", {
       volume: 0.5
@@ -47,6 +51,15 @@ class MainScene extends Phaser.Scene {
     this.noise.play();
     const { height, width } = this.scale;
     this.map = this.make.tilemap({ key: "map" });
+    const objectLayer = this.map.getObjectLayer("objects");
+    objectLayer.objects.forEach((o)=>{
+      const{x = 0, y = 0, name, width = 0, height = 0} = o;
+      switch(name){
+        case"player-spawn":
+        playerSpawn.x = x+width/2;
+        playerSpawn.y = y + height/2
+      }
+    })
     const marbleTiles = this.map.addTilesetImage("marble", "Marble");
     const rockTiles = this.map.addTilesetImage("rock", "Rock");
     const sandTiles = this.map.addTilesetImage("sand", "Sand");
@@ -75,7 +88,7 @@ class MainScene extends Phaser.Scene {
     })
     this.physics.add.collider(this.coins, platformLayer);
     this.physics.add.collider(this.coins, this.coins);
-    this.player = this.physics.add.sprite(WIDTH / 2, HEIGHT/ 2, "Robot",);
+    this.player = this.physics.add.sprite(playerSpawn.x, playerSpawn.y, "Robot",);
     this.physics.add.overlap(
       this.player,
       this.coins,
@@ -110,6 +123,8 @@ class MainScene extends Phaser.Scene {
       run: Phaser.Input.Keyboard.KeyCodes.SHIFT,
       down: Phaser.Input.Keyboard.KeyCodes.S,
       downArrow: Phaser.Input.Keyboard.KeyCodes.DOWN,
+      loud: Phaser.Input.Keyboard.KeyCodes.M,
+      quite: Phaser.Input.Keyboard.KeyCodes.L,
     });
     this.cameras.main.setBounds(0,0, WIDTH,HEIGHT);
     this.cameras.main.startFollow(this.player);
@@ -146,6 +161,18 @@ class MainScene extends Phaser.Scene {
     let x = this.player.body.velocity.X;
     let y = this.player.body.velocity.Y;
     this.player.flipX = x <0;
+    if(this.cursors.loud.isDown){
+      this.noise = this.sound.add("noise",{
+        loop: true,
+        volume: 2.5
+      });
+       }
+    if(this.cursors.quite.isDown){
+      this.noise = this.sound.add("noise",{
+        loop: true,
+        volume: 0.5
+      });
+    }
   }
  collectCoin(player, coin){
     this.coinNoise.play();
