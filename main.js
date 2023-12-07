@@ -147,6 +147,7 @@ class MainScene extends Phaser.Scene {
         .setBounce(Phaser.Math.FloatBetween(1))
         .setVelocityX(Phaser.Math.FloatBetween(-5,5))
     })
+    this.spike.spawn();
     this.physics.add.collider(this.spike, platformLayer);
     this.physics.add.overlap(
       this.player,
