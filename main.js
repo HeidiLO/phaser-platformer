@@ -117,8 +117,8 @@ class MainScene extends Phaser.Scene {
       this.coins,
       this.collectCoin,
       undefined,
-      this
-    )
+      this,
+    );
     this.player.setCollideWorldBounds(true);
     this.physics.add.collider(this.player, platformLayer);
     this.player.setBounce(0.5)
@@ -143,10 +143,9 @@ class MainScene extends Phaser.Scene {
     });
     this.spike.children.iterate((coin)=>{
       coin
-        .setCircle(40)
         .setCollideWorldBounds(true)
-        .setBounce(Phaser.Math.FloatBetween(0.2, 0.5))
-        .setVelocityX(Phaser.Math.FloatBetween(-5,5));
+        .setBounce(Phaser.Math.FloatBetween(1))
+        .setVelocityX(Phaser.Math.FloatBetween(-5,5))
     })
     this.physics.add.collider(this.spike, platformLayer);
     this.physics.add.overlap(
@@ -227,6 +226,7 @@ class MainScene extends Phaser.Scene {
   die(player, spike){
     this.dead.play();
    player.disableBody(true, true);
+   this.physics.pause();
   }
 }
 /**@type {Phaser.Types.Core.GameConfig}*/
