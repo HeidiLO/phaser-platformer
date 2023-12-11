@@ -3,6 +3,9 @@ import Phaser from "phaser";
 const TILE_SIZE = 18;
 const WIDTH = 40 * TILE_SIZE;
 const HEIGHT = 20 * TILE_SIZE;
+const restartDialog = document.getElementById("restart-dialog");
+const restartButton = document.getElementById("restart-button");
+const scoreSpan = document.getElementById("score-span");
 const PLAYER_ANIMAS = {
   idle: "idle",
   walk: "walk",
@@ -19,6 +22,9 @@ class MainScene extends Phaser.Scene {
     this.jumpNoise;
     this.coinNoise;
     this.noise;
+    this.enemySpawnPoints = [];
+    this.spikes;
+    this.score = 0;
   }
   preload() {
     this.load.atlas("Robot", "Robot.png", "Robot.json");
@@ -40,10 +46,6 @@ class MainScene extends Phaser.Scene {
       x: WIDTH /2,
       y: HEIGHT/2,
     };
-    let spikeSpawn = {
-      x: WIDTH /3,
-      y: HEIGHT /3,
-    }
     this.physics.world.setBounds(0,0,WIDTH, HEIGHT);
     this.coinNoise = this.sound.add("coin-noise", {
       volume: 0.5
@@ -64,7 +66,7 @@ class MainScene extends Phaser.Scene {
     });
     this.noise.play();
     this.music.play();
-    const { height, width } = this.scale;
+    // const { height, width } = this.scale;
     this.map = this.make.tilemap({ key: "map" });
     const objectLayer = this.map.getObjectLayer("objects");
     objectLayer.objects.forEach((o)=>{
@@ -73,15 +75,14 @@ class MainScene extends Phaser.Scene {
         case"player-spawn":
         playerSpawn.x = x+width/2;
         playerSpawn.y = y + height/2
-      }
-    })
-    objectLayer.objects.forEach((o)=>{
-      const{x = 0, y = 0, name, width = 0, height = 0} = o;
-      switch(name){
+        break;
         case"enemy-spawn":
-        spikeSpawn.x = x+width/4;
-        spikeSpawn.y = y + height/4;
-      }
+        this.enemySpawnPoints.push({
+          x: x + width /2,
+          y: y +height/2,
+        });
+        break;
+      } 
     })
     const marbleTiles = this.map.addTilesetImage("marble", "Marble");
     const rockTiles = this.map.addTilesetImage("rock", "Rock");
@@ -135,28 +136,6 @@ class MainScene extends Phaser.Scene {
       repeat: -1,
     });
     this.player.play("run");
-    this.spike = this.physics.add.group({
-      key: "spike",
-      quantity: 4,
-      setXY: {x: 18 * 4, y: 0, stepX: 18*3},
-      setScale: {x: 0.15, y: 0.15},
-    });
-    this.spike.children.iterate((coin)=>{
-      coin
-        .setCollideWorldBounds(true)
-        .setBounce(Phaser.Math.FloatBetween(1))
-        .setVelocityX(Phaser.Math.FloatBetween(-5,5))
-    })
-    this.physics.add.collider(this.spike, platformLayer);
-    this.physics.add.overlap(
-      this.player,
-      this.spike,
-      this.die,
-      undefined,
-      this
-    )
-    this.physics.add.collider(this.coins, this.spike);
-    this.physics.add.collider(this.spike, this.spike);
     this.cursors = this.input.keyboard.addKeys({
       left: Phaser.Input.Keyboard.KeyCodes.A,
       leftArrow: Phaser.Input.Keyboard.KeyCodes.LEFT,
@@ -174,6 +153,17 @@ class MainScene extends Phaser.Scene {
     this.cameras.main.setBounds(0,0, WIDTH,HEIGHT);
     this.cameras.main.startFollow(this.player);
     this.cameras.main.zoom = 7;
+    this.spikes = this.physics.add.group();
+    this.physics.add.collider(this.spikes, platformLayer);
+    this.physics.add.collider(this.coins, this.spike);
+    this.physics.add.collider(this.spike, this.spike);
+    this.physics.add.overlap(
+      this.player,
+      this.spikes,
+      this.die,
+      undefined,
+      this
+    )
   }
   update() {
     if (this.cursors.left.isDown || this.cursors.leftArrow.isDown) {
@@ -220,13 +210,25 @@ class MainScene extends Phaser.Scene {
     }
   }
  collectCoin(player, coin){
+  this.score++;
     this.coinNoise.play();
    coin.disableBody(true, true);
+   let spawn =
+   this.enemySpawnPoints[
+     Phaser.Math.Between(0, this.enemySpawnPoints.length - 1)
+   ];
+ let enemy = this.enemies.create(spawn.x, spawn.y, "enemy");
+ enemy
+   .setCollideWorldBounds(true)
+   .setBounce(1)
+   .setVelocity(Phaser.Math.FloatBetween(-200, 200), 20)
+   .setCircle(60, 12, 14)
+   .setScale(0.25);
   }
   die(player, spike){
     this.dead.play();
-   player.disableBody(true, true);
-   this.physics.pause();
+   this.player.disableBody(true, true);
+   restartDialog.showModal();
   }
 }
 /**@type {Phaser.Types.Core.GameConfig}*/
@@ -243,3 +245,7 @@ const config = {
   },
 };
 const game = new Phaser.Game(config);
+restartButton.addEventListener("click", () => {
+  game.scene.start("main-scene");
+  restartDialog.closest();
+})
